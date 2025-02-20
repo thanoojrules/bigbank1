@@ -9,10 +9,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     console.log("🔐 Token Retrieved:", token);
 
-    // 🌐 Dynamic API base URL based on environment
-    const API_BASE_URL = window.location.hostname === "localhost"
-        ? "http://localhost:5000/api"  // Local development
-        : "http://3.82.218.179:5000/api"; // Replace with your EC2 IP or domain
+    // 🌐 Dynamic API base URL based on current environment
+    const API_BASE_URL = `${window.location.origin}/api`;
+    console.log("🔗 API Base URL:", API_BASE_URL);
 
     // ✅ Fetch User Profile
     async function fetchUserProfile() {
@@ -21,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
-            const text = await response.text(); // Debugging step
+            const text = await response.text();
             console.log("🔍 API Response (Profile):", text);
 
             if (!response.ok) {
@@ -119,6 +118,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error("❌ Notification Fetch Error:", error);
         }
     }
+
+    // ✅ Logout Functionality
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("🚪 Logged out successfully.");
+        window.location.href = "login.html";
+    });
 
     // ✅ Fetch Everything on Page Load
     fetchUserProfile();

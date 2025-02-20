@@ -18,10 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            // Determine API base URL based on environment
-            const API_BASE_URL = window.location.hostname === "localhost"
-                ? "http://localhost:5000/api"  // Local development
-                : "http://3.237.171.168:5000/api"; // AWS EC2 Public IP (replace with your actual IP or domain)
+            // 🌐 Dynamic API base URL based on environment
+            const API_BASE_URL = `${window.location.origin}/api`;
+            console.log("🔗 API Base URL:", API_BASE_URL);
 
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
@@ -37,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("✅ Login successful! Redirecting...");
                 window.location.href = "dashboard.html"; // Redirect to dashboard
             } else {
-                alert(`🚨 Login failed: ${data.error || "Unknown error"}`);
+                alert(`🚨 Login failed: ${data.error || "Invalid credentials"}`);
             }
         } catch (error) {
             console.error("❌ Login request failed:", error);

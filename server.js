@@ -5,21 +5,18 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const mysql = require("mysql2");
 
-// ✅ Route Imports
-const authRoutes = require("./routes/authRoutes");
-const profileRoutes = require("./routes/profileRoutes");
-const transferRoutes = require("./routes/transferRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
-const transactionRoutes = require("./routes/transactionRoutes");
-const creditCardRoutes = require("./routes/creditCardRoutes");
-const adminRoutes = require("./routes/adminRoutes");  // ✅ Added Admin Routes
-
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors());
 
-// ✅ MySQL Connection (Using Promises)
+// 🌐 CORS Configuration (Allow all origins for now)
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// ✅ MySQL Connection
 const pool = mysql.createPool({
     connectionLimit: 10,
     host: process.env.DB_HOST,
@@ -41,41 +38,30 @@ const pool = mysql.createPool({
     }
 })();
 
-// ✅ User ID Middleware (Token Extraction)
-app.use((req, res, next) => {
-    const token = req.headers["authorization"]?.split(" ")[1];
-    if (token) {
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = decoded;  // Attach decoded user to request
-            console.log("✅ Extracted User ID:", req.user.id);
-        } catch (err) {
-            console.warn("⚠️ Invalid or expired token.");
-        }
+// ✅ API Health Check
+app.get("/api/health", (req, res) => {
+    res.json({ status: "✅ API is running smoothly!" });
+});
+
+// ✅ Auth Route Example
+app.post("/api/auth/login", (req, res) => {
+    const { email, password } = req.body;
+    if (email === "test@example.com" && password === "Password@123") {
+        const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        res.json({ message: "Login successful!", token });
+    } else {
+        res.status(401).json({ error: "Invalid email or password." });
     }
-    next();
 });
 
 // ✅ Static Frontend Path
-const frontendPath = path.join(__dirname, "/frontend");
-app.use(express.static(frontendPath));
+app.use(express.static(path.join(__dirname, "frontend")));
 
-// ✅ Serve index.html
-app.get("/", (req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
+// ✅ Serve index.html for SPA
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
-
-// ✅ API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/user", profileRoutes);
-app.use("/api/transfer", transferRoutes);
-app.use("/api/notifications", notificationRoutes);
-app.use("/api/transactions", transactionRoutes);
-app.use("/api/credit", creditCardRoutes);
-app.use("/api/admin", adminRoutes);  // ✅ Registered Admin Routes
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
-
-module.exports = pool;
