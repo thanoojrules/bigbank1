@@ -1,23 +1,27 @@
 require("dotenv").config();
-const { Pool } = require("pg");
+const mysql = require("mysql2");
 
-const pool = new Pool({
-    user: "thanooj",
-    host: "bigbankdbserver.postgres.database.azure.com",
-    database: "bigbankdb",  // ✅ Check that this is the correct database
-    password: "T#@nOOj@0899",
-    port: 5432,
-    ssl: { rejectUnauthorized: false }
+// ✅ Create a MySQL Connection Pool
+const pool = mysql.createPool({
+    connectionLimit: 10, // Adjust as needed
+    host: process.env.DB_HOST, // AWS RDS endpoint
+    user: process.env.DB_USER, // MySQL username
+    password: process.env.DB_PASS, // MySQL password
+    database: process.env.DB_NAME, // MySQL database
+    port: process.env.DB_PORT || 3306, // Default MySQL port
+    ssl: { rejectUnauthorized: false } // Needed if AWS RDS requires SSL
 });
 
 // ✅ Test Database Connection
-pool.connect((err, client, release) => {
+pool.getConnection((err, connection) => {
     if (err) {
-        console.error("❌ Database connection error:", err.stack);
+        console.error("❌ Database connection error:", err.message);
+        process.exit(1); // Exit if unable to connect
     } else {
-        console.log("✅ Connected to Azure PostgreSQL");
-        release();
+        console.log("✅ Connected to AWS MySQL Database!");
+        connection.release(); // Release the connection back to the pool
     }
 });
 
+// ✅ Export pool for use in other files
 module.exports = pool;
