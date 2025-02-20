@@ -3,29 +3,29 @@ const router = express.Router();
 const pool = require("../config/db");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// ✅ Fetch Transaction History API
+// ✅ Fetch Transaction History
 router.get("/", authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
         console.log(`📌 Fetching transactions for User ID: ${userId}`);
 
-        const transactions = await pool.query(
+        const [transactions] = await pool.query(
             `SELECT t.id, t.transaction_type, t.amount, t.status, t.created_at,
                     sender.email AS sender_email,
                     recipient.email AS recipient_email
              FROM transactions t
              LEFT JOIN users sender ON t.user_id = sender.id
              LEFT JOIN users recipient ON t.recipient_id = recipient.id
-             WHERE t.user_id = $1 OR t.recipient_id = $1
+             WHERE t.user_id = ? OR t.recipient_id = ?
              ORDER BY t.created_at DESC`,
-            [userId]
+            [userId, userId]
         );
 
-        console.log(`✅ Transactions Fetched: ${transactions.rows.length} records`);
-        res.json(transactions.rows);
+        console.log(`✅ Transactions Fetched: ${transactions.length} records`);
+        res.json(transactions);
     } catch (error) {
         console.error("❌ Transaction Fetch Error:", error);
-        res.status(500).json({ error: "Internal server error while fetching transactions" });
+        res.status(500).json({ error: "❌ Internal server error while fetching transactions" });
     }
 });
 

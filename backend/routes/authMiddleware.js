@@ -9,11 +9,11 @@ module.exports = (req, res, next) => {
             return res.status(401).json({ error: "Unauthorized: No token" });
         }
 
+        // ✅ Verify JWT and attach user to request
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
 
         console.log("🔍 Decoded Token:", decoded);
-
         next();
     } catch (error) {
         console.error("❌ Token Verification Error:", error);

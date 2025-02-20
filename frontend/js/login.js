@@ -9,17 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     loginForm.addEventListener("submit", async function (event) {
         event.preventDefault(); // Prevent form refresh
 
-        // Get input values safely
-        const emailField = document.getElementById("email");
-        const passwordField = document.getElementById("password");
-
-        if (!emailField || !passwordField) {
-            console.error("❌ Email or Password field not found.");
-            return;
-        }
-
-        const email = emailField.value.trim();
-        const password = passwordField.value.trim();
+        const email = document.getElementById("email")?.value.trim();
+        const password = document.getElementById("password")?.value.trim();
 
         if (!email || !password) {
             alert("⚠️ Please enter both email and password.");
@@ -27,22 +18,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const API_BASE_URL = "http://20.151.166.147:3000/api"; // ✅ Updated to VM IP
+            const API_BASE_URL = "http://localhost:3000/api"; // ✅ Using localhost
 
-            const response = await fetch(`${API_BASE_URL}/auth/login`, { 
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
 
             const data = await response.json();
+            console.log("🔍 API Response:", data);
 
-            if (response.ok) {
+            if (response.ok && data.token) {
                 localStorage.setItem("token", data.token);
-                alert("✅ Login successful!");
+                alert("✅ Login successful! Redirecting...");
                 window.location.href = "dashboard.html"; // Redirect to dashboard
             } else {
-                alert(`🚨 Login failed: ${data.error}`);
+                alert(`🚨 Login failed: ${data.error || "Unknown error"}`);
             }
         } catch (error) {
             console.error("❌ Login request failed:", error);

@@ -11,12 +11,20 @@
     <div class="signup-wrapper">
         <div class="signup-container">
             <h2>Sign up for <span class="highlight">BigBank</span></h2>
+
+            <!-- Signup Form -->
             <form id="signupForm">
+                <input type="text" id="name" name="name" placeholder="Enter Full Name" required>
                 <input type="email" id="email" name="email" placeholder="Enter Email" required>
                 <input type="password" id="password" name="password" placeholder="Create Password" required>
                 <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+
                 <button type="submit">Sign Up</button>
             </form>
+
+            <!-- Feedback Message -->
+            <div id="responseMessage"></div>
+
             <p>Already have an account? <a href="login.html">Login</a></p>
         </div>
     </div>

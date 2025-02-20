@@ -1,79 +1,86 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
-
 const router = express.Router();
 
-// ✅ User Signup API (Ensures DB Commit)
+// 🔑 Secret for JWT
+const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey";
+
+// ✅ User Signup
 router.post("/signup", async (req, res) => {
+    const { name, email, password, role = "user" } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: "❌ Name, email, and password are required!" });
+    }
+
     try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ error: "❌ All fields are required!" });
+        // ✅ Check if user exists
+        const [existingUser] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
+        if (existingUser.length > 0) {
+            return res.status(400).json({ error: "❌ User already exists!" });
         }
 
-        // ✅ Check if Email Already Exists
-        const emailCheck = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
-        if (emailCheck.rows.length > 0) {
-            return res.status(400).json({ error: "❌ Email already exists!" });
-        }
-
-        // ✅ Insert User and Commit Transaction
-        const newUser = await pool.query(
-            "INSERT INTO users (email, password, balance, savings) VALUES ($1, $2, 2000, 1000) RETURNING id, email, balance, savings",
-            [email, password]
+        // ✅ Insert new user
+        const [result] = await pool.query(
+            "INSERT INTO users (name, email, password, role, balance, savings) VALUES (?, ?, ?, ?, 2000.00, 1000.00)",
+            [name, email, password, role]
         );
 
-        // ✅ Log to Confirm Data Insertion
-        console.log("🔥 User Added Successfully: ", newUser.rows[0]);
-
-        // ✅ Generate JWT Token
-        const token = jwt.sign({ id: newUser.rows[0].id, email: newUser.rows[0].email }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
-        res.json({ message: "✅ Account created successfully!", token, user: newUser.rows[0] });
+        if (result.affectedRows === 1) {
+            // ✅ Generate JWT token
+            const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: "1h" });
+            res.json({ message: "✅ User registered successfully!", token });
+        } else {
+            res.status(500).json({ error: "❌ Failed to register user." });
+        }
     } catch (error) {
-        console.error("❌ Signup Error:", error);
-        res.status(500).json({ error: `Server error during signup. Details: ${error.message}` });
+        console.error("❌ Signup Error:", error.message);
+        res.status(500).json({ error: `❌ Server error during signup: ${error.message}` });
     }
 });
-// ✅ User Login API
+
+// ✅ User Login
 router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: "❌ Email and password are required!" });
+    }
+
     try {
-        const { email, password } = req.body;
+        const [users] = await pool.query("SELECT id, name, email, password, role FROM users WHERE email = ?", [email]);
 
-        if (!email || !password) {
-            return res.status(400).json({ error: "❌ Email and password are required!" });
+        if (users.length === 0) {
+            return res.status(401).json({ error: "❌ User not found!" });
         }
 
-        console.log("📌 Login Request Received:", email);
+        const user = users[0];
 
-        // ✅ Check if User Exists
-        const result = await pool.query("SELECT id, email, password FROM users WHERE email = $1", [email]);
-
-        if (result.rows.length === 0) {
-            console.log("❌ User not found:", email);
-            return res.status(401).json({ error: "❌ Invalid credentials" });
-        }
-
-        const user = result.rows[0];
-
-        // ✅ Compare Passwords
-        if (password !== user.password) {
-            console.log("❌ Incorrect password for:", email);
-            return res.status(401).json({ error: "❌ Invalid credentials" });
+        // ✅ Plain text password comparison
+        if (user.password !== password) {
+            return res.status(401).json({ error: "❌ Invalid credentials!" });
         }
 
         // ✅ Generate JWT Token
-        const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        console.log("✅ Login Successful:", email);
+        console.log("✅ Login successful! Token:", token);
 
-        res.json({ message: "✅ Login successful!", token, user: { id: user.id, email: user.email } });
+        // ✅ Send back user info and token
+        res.json({
+            message: "✅ Login successful!",
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
     } catch (error) {
-        console.error("❌ Login Error:", error);
-        res.status(500).json({ error: `Server error during login. Details: ${error.message}` });
+        console.error("❌ Login Error:", error.message);
+        res.status(500).json({ error: "❌ Server error during login." });
     }
 });
-
 module.exports = router;

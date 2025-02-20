@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("token");
 
     if (!token) {
+        alert("❌ Unauthorized! Please log in.");
         window.location.href = "login.html";
         return;
     }
@@ -11,12 +12,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch User Profile
     async function fetchUserProfile() {
         try {
-            const response = await fetch("/api/user/profile", {
+            const response = await fetch("http://localhost:3000/api/user/profile", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
             const text = await response.text(); // Debugging step
-            console.log("🔍 API Response:", text);
+            console.log("🔍 API Response (Profile):", text);
 
             if (!response.ok) {
                 throw new Error(`HTTP Error: ${response.status} - ${text}`);
@@ -36,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch Transaction History
     async function fetchTransactionHistory() {
         try {
-            const response = await fetch("/api/transactions", {
+            const response = await fetch("http://localhost:3000/api/transactions", {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -82,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch Notifications
     async function fetchNotifications() {
         try {
-            const response = await fetch("/api/notifications", {
+            const response = await fetch("http://localhost:3000/api/notifications", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -125,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         try {
-            const response = await fetch("/api/user/update", {
+            const response = await fetch("http://localhost:3000/api/user/update", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -163,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             console.log(`📤 Sending transfer request to API: recipient=${recipientEmail}, amount=${transferAmount}`);
 
-            const response = await fetch("/api/transfer", {
+            const response = await fetch("http://localhost:3000/api/transfer", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -198,18 +199,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.location.href = "login.html";
     });
 
-   document.addEventListener("DOMContentLoaded", function () {
-    const userInfoBtn = document.getElementById("userInfoBtn");
+    // ✅ User Info Navigation
+    document.getElementById("userInfoBtn")?.addEventListener("click", function () {
+        console.log("✅ Redirecting to customer.html");
+        window.location.href = "/customer.html";  // Ensure correct path
+    });
 
-    if (userInfoBtn) {
-        userInfoBtn.addEventListener("click", function () {
-            console.log("✅ Redirecting to customer.html");
-            window.location.href = "/customer.html";  // ✅ Ensure correct path
-        });
-    } else {
-        console.error("❌ User Info Button Not Found");
-    }
-});
     // ✅ Fetch Everything on Page Load
     fetchUserProfile();
     fetchTransactionHistory();

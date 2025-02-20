@@ -8,13 +8,13 @@ router.get("/", authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
 
-        const notifications = await pool.query(
-            "SELECT id, message, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC",
+        const [notifications] = await pool.query(
+            "SELECT id, message, created_at FROM notifications WHERE user_id = ? ORDER BY created_at DESC",
             [userId]
         );
 
-        console.log(`✅ Notifications Fetched: ${notifications.rows.length} records`);
-        res.json(notifications.rows);
+        console.log(`✅ Notifications Fetched: ${notifications.length} records`);
+        res.json(notifications);
     } catch (error) {
         console.error("❌ Notification Fetch Error:", error);
         res.status(500).json({ error: "Internal server error while fetching notifications" });
