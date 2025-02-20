@@ -18,7 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const API_BASE_URL = "http://localhost:5000/api"; // ✅ Using localhost
+            // Determine API base URL based on environment
+            const API_BASE_URL = window.location.hostname === "localhost"
+                ? "http://localhost:5000/api"  // Local development
+                : "http://3.237.171.168:5000/api"; // AWS EC2 Public IP (replace with your actual IP or domain)
 
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
