@@ -43,4 +43,5 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("🚨 Network error. Try again later.");
         }
     });
-});
+}
+);
