@@ -3,7 +3,7 @@ name: Deploy to AWS ECS
 on:
   push:
     branches:
-      - test4  # Triggers deployment when code is pushed to the final branch
+      - newtest  # Triggers deployment when code is pushed to the final branch
 
 jobs:
   build-and-deploy:
