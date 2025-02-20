@@ -75,7 +75,7 @@ app.use("/api/credit", creditCardRoutes);
 app.use("/api/admin", adminRoutes);  // ✅ Registered Admin Routes
 
 // ✅ Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
 
 module.exports = pool;

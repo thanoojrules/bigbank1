@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch User Profile
     async function fetchUserProfile() {
         try {
-            const response = await fetch("http://localhost:3000/api/user/profile", {
+            const response = await fetch("http://localhost:5000/api/user/profile", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch Transaction History
     async function fetchTransactionHistory() {
         try {
-            const response = await fetch("http://localhost:3000/api/transactions", {
+            const response = await fetch("http://localhost:5000/api/transactions", {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch Notifications
     async function fetchNotifications() {
         try {
-            const response = await fetch("http://localhost:3000/api/notifications", {
+            const response = await fetch("http://localhost:5000/api/notifications", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         try {
-            const response = await fetch("http://localhost:3000/api/user/update", {
+            const response = await fetch("http://localhost:5000/api/user/update", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             console.log(`📤 Sending transfer request to API: recipient=${recipientEmail}, amount=${transferAmount}`);
 
-            const response = await fetch("http://localhost:3000/api/transfer", {
+            const response = await fetch("http://localhost:5000/api/transfer", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     try {
         // ✅ Fetch users
-        const usersResponse = await fetch('http://localhost:3000/api/admin/users', {
+        const usersResponse = await fetch('http://localhost:5000/api/admin/users', {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
 
         // ✅ Fetch transactions
-        const transactionsResponse = await fetch('http://localhost:3000/api/admin/transactions', {
+        const transactionsResponse = await fetch('http://localhost:5000/api/admin/transactions', {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token }
         });

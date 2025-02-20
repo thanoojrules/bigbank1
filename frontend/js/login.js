@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const API_BASE_URL = "http://localhost:3000/api"; // ✅ Using localhost
+            const API_BASE_URL = "http://localhost:5000/api"; // ✅ Using localhost
 
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
