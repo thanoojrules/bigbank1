@@ -26,7 +26,7 @@ jobs:
 
       - name: Build and Tag Docker Image
         run: |
-          ECR_REPO_URI=http://241533127016.dkr.ecr.us-east-2.amazonaws.com/bigbank-ecr-repository
+          ECR_REPO_URI=241533127016.dkr.ecr.us-east-2.amazonaws.com/bigbank-ecr-repository
           docker build -t $ECR_REPO_URI:latest .
           echo "ECR_REPO_URI=$ECR_REPO_URI" >> $GITHUB_ENV
 
