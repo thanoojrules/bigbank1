@@ -9,10 +9,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     console.log("🔐 Token Retrieved:", token);
 
+    // 🌐 Dynamic API base URL based on current environment
+    const API_BASE_URL = `${window.location.origin}/api`;
+    console.log("🔗 API Base URL:", API_BASE_URL);
+
     // ✅ Fetch User Profile
     async function fetchUserProfile() {
         try {
-            const response = await fetch("http://localhost:5000/api/user/profile", {
+            const response = await fetch(`${API_BASE_URL}/user/profile`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -37,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch Transaction History
     async function fetchTransactionHistory() {
         try {
-            const response = await fetch("http://localhost:5000/api/transactions", {
+            const response = await fetch(`${API_BASE_URL}/transactions`, {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -83,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ✅ Fetch Notifications
     async function fetchNotifications() {
         try {
-            const response = await fetch("http://localhost:5000/api/notifications", {
+            const response = await fetch(`${API_BASE_URL}/notifications`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
 
@@ -114,96 +118,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error("❌ Notification Fetch Error:", error);
         }
     }
-
-    // ✅ Update Profile
-    async function updateProfile() {
-        const email = document.getElementById("newEmail").value.trim();
-        const password = document.getElementById("newPassword").value.trim();
-
-        if (!email && !password) {
-            alert("❌ Please enter an email or password to update.");
-            return;
-        }
-
-        try {
-            const response = await fetch("http://localhost:5000/api/user/update", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "❌ Profile update failed.");
-            }
-
-            alert("✅ Profile updated successfully!");
-            fetchUserProfile(); // Refresh profile data
-        } catch (error) {
-            console.error("❌ Update Profile Error:", error);
-            alert(error.message);
-        }
-    }
-
-    document.getElementById("updateProfileBtn")?.addEventListener("click", updateProfile);
-
-    // ✅ Transfer Money
-    async function transferMoney() {
-        const recipientEmail = document.getElementById("recipientEmail").value.trim();
-        const transferAmount = parseFloat(document.getElementById("transferAmount").value);
-
-        if (!recipientEmail || isNaN(transferAmount) || transferAmount <= 0) {
-            alert("❌ Please enter a valid recipient email and amount!");
-            return;
-        }
-
-        try {
-            console.log(`📤 Sending transfer request to API: recipient=${recipientEmail}, amount=${transferAmount}`);
-
-            const response = await fetch("http://localhost:5000/api/transfer", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ recipientEmail, amount: transferAmount })
-            });
-
-            const data = await response.json();
-
-            console.log("🔍 Transfer API Response:", data);
-
-            if (!response.ok) {
-                throw new Error(data.error || "❌ Transfer failed.");
-            }
-
-            alert("✅ Transfer successful!");
-            fetchUserProfile();
-            fetchTransactionHistory();
-            fetchNotifications();
-        } catch (error) {
-            console.error("❌ Transfer Error:", error);
-            alert(`Transfer failed: ${error.message}`);
-        }
-    }
-
-    document.getElementById("transferBtn")?.addEventListener("click", transferMoney);
-
-    // ✅ Logout Functionality
-    document.getElementById("logoutBtn")?.addEventListener("click", function () {
-        localStorage.removeItem("token");
-        window.location.href = "login.html";
-    });
-
-    // ✅ User Info Navigation
-    document.getElementById("userInfoBtn")?.addEventListener("click", function () {
-        console.log("✅ Redirecting to customer.html");
-        window.location.href = "/customer.html";  // Ensure correct path
-    });
 
     // ✅ Fetch Everything on Page Load
     fetchUserProfile();
