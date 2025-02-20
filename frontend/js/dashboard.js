@@ -9,9 +9,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     console.log("🔐 Token Retrieved:", token);
 
-    // 🌐 Dynamic API base URL based on current environment
-    const API_BASE_URL = `${window.location.origin}/api`;
-    console.log("🔗 API Base URL:", API_BASE_URL);
+    // 🌐 Dynamic API base URL based on environment
+    const API_BASE_URL = window.location.hostname === "localhost"
+        ? "http://localhost:5000/api"  // Local development
+        : "http://3.82.218.179:5000/api"; // Replace with your EC2 IP or domain
 
     // ✅ Fetch User Profile
     async function fetchUserProfile() {
